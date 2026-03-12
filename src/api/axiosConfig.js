@@ -5,7 +5,7 @@ const getBaseUrl = () => {
     const host = typeof window !== 'undefined' ? window.location.hostname : '';
 
     if (host.includes('vercel.app') || host === 'innovet-tech-school.vercel.app') {
-      return 'https://innovet-tech-sch.onrender.com/';
+      return 'https://innovet-tech-school.onrender.com/';
     }
 
     const envUrl = import.meta?.env?.VITE_API_URL;
