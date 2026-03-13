@@ -26,10 +26,8 @@ import { cn } from "@/lib/utils";
 import { 
   LogOut, 
   User, 
-  Settings,
   ChevronDown,
   GraduationCap,
-  FileText,
   Menu,
   LayoutDashboard,
   BookOpen,
@@ -235,6 +233,7 @@ const NavLink = ({ to, children, active }) => (
   </Link>
 );
 
+// eslint-disable-next-line no-unused-vars
 const MobileNavLink = ({ to, children, icon: Icon, isActive, setIsOpen }) => (
   <Link 
     to={to} 

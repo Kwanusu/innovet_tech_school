@@ -5,7 +5,7 @@ import { fetchCourseById, markLessonComplete } from '../school/schoolSlice';
 import LessonSidebar from '../pages/Sidebar';
 import LessonNavigationFooter from '../pages/LessonNavigationFooter';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, AlertCircle, FileText, Video } from "lucide-react";
+import { Loader2, AlertCircle, FileText } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const LessonDetailPage = () => {

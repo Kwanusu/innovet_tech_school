@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, MoreVertical, Trash2, UserCog, UserCheck, Users, Archive, Loader2, AlertCircle } from 'lucide-react';
 import API from '../api/axiosConfig';
+import { toast } from 'sonner';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -40,8 +41,8 @@ const UserManagement = () => {
 
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: false } : u));
       setActiveMenu(null);
-    } catch (err) {
-      alert("Action failed. Admin privileges required.");
+    } catch {
+      toast("Action failed. Admin privileges required.");
     }
   };
 
@@ -50,8 +51,8 @@ const UserManagement = () => {
           await API.patch(`/api/users/${userId}/`, { is_active: true });
           setUsers(users.map(u => u.id === userId ? { ...u, is_active: true } : u));
           setActiveMenu(null);
-      } catch (err) {
-          alert("Restore failed.");
+      } catch {
+          toast("Restore failed.");
       }
   };
 
