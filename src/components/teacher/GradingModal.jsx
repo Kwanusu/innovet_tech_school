@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { gradeSubmission } from '../../school/schoolSlice';
 import { toast } from "sonner";
@@ -10,21 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, AlertCircle, Send, MessageSquareQuote, GraduationCap } from "lucide-react";
+import { CheckCircle2, Send, MessageSquareQuote, GraduationCap, Loader2 } from "lucide-react";
 
 const GradingModal = ({ isOpen, onClose, submission }) => {
   const dispatch = useDispatch();
   
-  const [grade, setGrade] = useState("");
-  const [feedback, setFeedback] = useState("");
+  // Initialize state directly from props to avoid the "useEffect sync" linter error
+  const [grade, setGrade] = useState(submission?.grade?.toString() || "");
+  const [feedback, setFeedback] = useState(submission?.feedback || "");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (submission) {
-      setGrade(submission.grade?.toString() || "");
-      setFeedback(submission.feedback || "");
-    }
-  }, [submission, isOpen]);
 
   const getScoreColor = (val) => {
     const num = parseInt(val);
@@ -41,39 +35,41 @@ const GradingModal = ({ isOpen, onClose, submission }) => {
     }
 
     setLoading(true);
-    const result = await dispatch(gradeSubmission({ 
-      id: submission.id, 
-      grade: parseInt(grade), 
-      feedback 
-    }));
-    
-    if (!result.error) {
+    try {
+      await dispatch(gradeSubmission({ 
+        id: submission.id, 
+        grade: parseInt(grade), 
+        feedback 
+      })).unwrap(); // Use unwrap() for cleaner async handling
+      
       toast.success("Grade Published", {
         icon: <CheckCircle2 className="text-emerald-500" />,
-        description: `${submission.student_name} has been notified of their result.`
+        description: `${submission.student_name} has been notified.`
       });
       onClose();
-    } else {
+    } catch {
+      // Empty catch satisfies 'no-unused-vars' for 'err'
       toast.error("Submission Failed", {
         description: "Could not save grade. Please try again."
       });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-120 rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden">
         <div className="bg-slate-900 p-8 text-white relative">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="bg-white/10 p-2 rounded-xl">
-                <GraduationCap className="h-5 w-5 text-primary" />
+                <GraduationCap className="h-5 w-5 text-indigo-400" />
               </div>
-              <DialogTitle className="text-2xl font-black tracking-tight">Assessment Portal</DialogTitle>
+              <DialogTitle className="text-2xl font-black tracking-tight text-white">Assessment Portal</DialogTitle>
             </div>
             <DialogDescription className="text-slate-400 font-medium">
-              Reviewing work for <span className="text-white font-bold">{submission?.student_name}</span>
+              Reviewing work for <span className="text-white font-bold">{submission?.student_name || "Student"}</span>
             </DialogDescription>
           </DialogHeader>
           <MessageSquareQuote className="absolute right-8 top-8 h-12 w-12 text-white/5" />
@@ -130,18 +126,18 @@ const GradingModal = ({ isOpen, onClose, submission }) => {
               placeholder="Provide constructive criticism or praise..." 
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              className="min-h-[120px] rounded-2xl border-slate-100 p-4 font-medium leading-relaxed focus:ring-primary/20"
+              className="min-h-30 rounded-2xl border-slate-100 p-4 font-medium leading-relaxed focus:ring-primary/20"
             />
           </div>
 
-          <DialogFooter className="pt-2">
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={onClose} type="button" className="rounded-xl font-bold text-slate-400 hover:text-slate-600">
               Discard
             </Button>
             <Button 
               type="submit" 
               disabled={loading} 
-              className="h-12 px-8 rounded-xl font-black bg-slate-900 hover:bg-primary transition-all shadow-xl shadow-slate-200 flex items-center gap-2"
+              className="h-12 px-8 rounded-xl font-black bg-slate-900 text-white hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 flex items-center gap-2"
             >
               {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Send className="h-4 w-4" />}
               Publish Grade
