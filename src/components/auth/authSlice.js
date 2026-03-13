@@ -77,7 +77,28 @@ const authSlice = createSlice({
                 state.error = action.payload;
                 state.isAuthenticated = false;
             })
-
+            .addCase(login.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.user = action.payload;
+                state.token = localStorage.getItem('token');
+                state.isAuthenticated = true;
+            })
+            .addCase(login.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+                state.isAuthenticated = false;
+            })
+            addCase(register.pending, (state) => {
+                state.status = 'loading'; 
+                state.error = null;
+            })
+            .addCase(register.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+            })
+            .addCase(register.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload; 
+            })
             .addCase(loadUser.pending, (state) => {
                 state.status = 'loading';
             })
