@@ -88,7 +88,7 @@ const authSlice = createSlice({
                 state.error = action.payload;
                 state.isAuthenticated = false;
             })
-            addCase(register.pending, (state) => {
+            .addCase(register.pending, (state) => {
                 state.status = 'loading'; 
                 state.error = null;
             })
