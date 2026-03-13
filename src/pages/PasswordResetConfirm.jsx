@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Lock, Loader2, AlertCircle, School, CheckCircle2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import API from '../api/axiosConfig';
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,8 +23,8 @@ const ResetPasswordConfirm = () => {
         await API.get(`api/auth/validate-token/${uid}/${token}/`);
         setStatus('idle');
       } catch (err) {
-        setError("This password reset link is invalid or has expired.");
-        setStatus('error');
+       setError(err.response?.data?.detail || 'An error occurred. Please try again.');
+      setStatus('error');
       }
     };
     validateToken();

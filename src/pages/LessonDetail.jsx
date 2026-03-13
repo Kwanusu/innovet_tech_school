@@ -15,14 +15,12 @@ const LessonDetailPage = () => {
   const { currentCourse, completedLessons, status, error } = useSelector((state) => state.school);
   const isSubmitting = status === 'updating-progress';
 
-  // 1. Fetch Course Data if not present or ID mismatch
   useEffect(() => {
     if (!currentCourse || currentCourse.id.toString() !== courseId) {
       dispatch(fetchCourseById(courseId));
     }
   }, [dispatch, courseId, currentCourse]);
 
-  // 2. Memoize Lesson Finding to prevent unnecessary recalculations
   const currentLesson = useMemo(() => {
     return currentCourse?.topics
       ?.flatMap((t) => t.lessons)
@@ -35,7 +33,6 @@ const LessonDetailPage = () => {
     dispatch(markLessonComplete({ courseId, lessonId }));
   };
 
-  // --- LOADING STATE ---
   if (status === 'loading' && !currentCourse) {
     return (
       <div className="flex h-[calc(100vh-65px)] items-center justify-center bg-white">
@@ -111,7 +108,6 @@ const LessonDetailPage = () => {
                       dangerouslySetInnerHTML={{ __html: currentLesson.content }} 
                     />
                   ) : (
-                    /* DEBUG/FALLBACK: If Content is missing but Lesson was found */
                     <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
                       <div className="bg-slate-50 p-4 rounded-full">
                         <FileText className="h-10 w-10 text-slate-300" />

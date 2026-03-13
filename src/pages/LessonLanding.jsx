@@ -73,9 +73,11 @@ const LessonLandingPage = () => {
                 </div>
               </div>
             </div>
-
             <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-white/10">
-              <h3 className="text-slate-900 font-black text-xl mb-4">Your Journey</h3>
+              <h3 className="text-slate-900 font-black text-xl mb-1">
+                  {user?.first_name ? `${user.first_name}'s Journey` : 'Your Journey'}
+              </h3>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Student Dashboard</p>  
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-black">

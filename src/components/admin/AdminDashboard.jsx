@@ -114,7 +114,7 @@ const AdminDashboard = () => {
 
             <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
               <h3 className="text-xs font-black mb-6 uppercase tracking-[0.2em]">Activity Feed</h3>
-              <div className="space-y-5 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-5 max-h-87.5 overflow-y-auto pr-2 custom-scrollbar">
                 {data.recent_activity?.map((log) => (
                   <div key={log.id} className="flex gap-4 items-start pb-4 border-b border-slate-50 last:border-0">
                     <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
             <HealthIndicator icon={Shield} label="Security Engine" status="Active" latency={`${data.metrics?.system_alerts} flags`} />
           </div>
           <div className="bg-slate-900 p-12 rounded-[3rem] border border-slate-800 flex items-center justify-center relative overflow-hidden">
-             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500 via-transparent to-transparent"></div>
+             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-indigo-500 via-transparent to-transparent"></div>
              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.8em] animate-pulse">Monitoring Real-time Network Traffic</p>
           </div>
         </TabsContent>
@@ -180,6 +180,7 @@ const AdminDashboard = () => {
   );
 };
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ title, value, icon: Icon, color }) => (
   <div className="bg-white p-7 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
     <div className="flex justify-between items-start">
@@ -230,7 +231,7 @@ const UserRow = ({ user }) => (
   </tr>
 );
 
-const HealthIndicator = ({ icon: Icon, label, status, latency }) => (
+const HealthIndicator = ({ icon: label, status, latency }) => (
   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 flex items-center gap-6 shadow-sm">
     <div className="p-4 bg-slate-50 rounded-2xl text-slate-900"><Icon size={24} /></div>
     <div>

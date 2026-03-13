@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { login, clearAuthError } from '../components/auth/authSlice';
 import { Lock, User, Loader2, AlertCircle, School, CheckCircle2, Dot } from 'lucide-react';
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import API from '../../api/axiosConfig'; 
-import { X, Mail, Shield, UserPlus, Loader2, CheckCircle2, Copy, AlertTriangle, Key } from 'lucide-react';
+import { X, Mail, Shield, UserPlus, Loader2, CheckCircle2, Copy, AlertTriangle } from 'lucide-react';
 
 const InviteStaffModal = ({ isOpen, onClose, onRefresh }) => {
   const [formData, setFormData] = useState({
@@ -31,7 +31,6 @@ const InviteStaffModal = ({ isOpen, onClose, onRefresh }) => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    // Optional: Add a "Copied!" toast here
   };
 
   const handleClose = () => {
@@ -44,7 +43,7 @@ const InviteStaffModal = ({ isOpen, onClose, onRefresh }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
         
         <div className="p-8 pb-4 flex justify-between items-start">

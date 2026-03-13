@@ -154,7 +154,7 @@ const LessonSidebar = ({ course, completedLessons = [] }) => {
           ))}
 
           {stats.percentage === 100 && (
-            <div className="mx-2 p-5 bg-gradient-to-br from-indigo-50 to-emerald-50 border border-emerald-100 rounded-[2rem] text-center space-y-3 shadow-sm animate-in zoom-in-95 duration-500">
+            <div className="mx-2 p-5 bg-linear-to-br from-indigo-50 to-emerald-50 border border-emerald-100 rounded-[2rem] text-center space-y-3 shadow-sm animate-in zoom-in-95 duration-500">
               <div className="bg-white w-12 h-12 rounded-2xl shadow-sm flex items-center justify-center mx-auto ring-4 ring-emerald-50">
                 <Trophy className="text-emerald-500 h-6 w-6" />
               </div>

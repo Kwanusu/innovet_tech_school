@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-// Auth Actions
 import { loadUser } from './components/auth/authSlice';
 
-// Components & Pages
 import Login from './pages/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Navbar from './components/layouts/Navbar';

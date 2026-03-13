@@ -53,7 +53,7 @@ const CourseCreateForm = ({ onSuccess, initialData, isEditMode }) => {
                 );
             }
         }
-    }, [initialData, isEditMode]);
+    }, [initialData, isEditMode, courseData]);
 
     // --- State Helpers ---
     const addTopic = () => {

@@ -21,7 +21,8 @@ const ForgotPassword = () => {
       await API.post('api/auth/forgot-password/', { email });
       setStatus('success');
     } catch (err) {
-      setStatus('success');
+      setError(err.response?.data?.detail || 'An error occurred. Please try again.');
+      setStatus('error');
     }
   };
 
@@ -78,6 +79,7 @@ const ForgotPassword = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && <div className="text-red-500">{error}</div>}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="font-semibold text-slate-700">Email Address</Label>
                   <div className="relative">
