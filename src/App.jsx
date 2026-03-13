@@ -10,13 +10,13 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Navbar from './components/layouts/Navbar';
 import LessonDetailPage from './pages/LessonDetail';
 import Register from './pages/Register';
-import CourseCurriculum from './components/student/CourseCurriculum';
 import StudentGrades from './components/student/StudentGrade';
 import BrowseCoursesPage from './components/courses/BrowseCourses';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/PasswordResetConfirm';
+import CoursePlayer from './components/student/CoursePlayer';
 
 function App() {
   const dispatch = useDispatch();
@@ -85,7 +85,7 @@ function App() {
               path="/courses/:courseId/learn" 
               element={
                 <ProtectedRoute allowedRoles={['STUDENT']}>
-                  <CourseCurriculum />
+                  <CoursePlayer />
                 </ProtectedRoute>
               } 
             />
