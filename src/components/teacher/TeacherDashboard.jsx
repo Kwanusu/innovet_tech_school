@@ -38,7 +38,6 @@ import { toast } from 'sonner';
 const TeacherDashboard = () => {
   const dispatch = useDispatch();
   
-  // Redux State
   const { submissions = [], instructorCourses = [], status } = useSelector((state) => state.school);
   const { user } = useSelector((state) => state.auth);
 
@@ -84,7 +83,7 @@ const TeacherDashboard = () => {
         data: { is_published: newStatus } 
       })).unwrap();
       toast.success(newStatus ? "Course is now LIVE!" : "Course moved to Drafts.");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update status.");
     }
   };
@@ -99,13 +98,11 @@ const TeacherDashboard = () => {
       try {
         await dispatch(deleteCourse(id)).unwrap();
         toast.success("Course deleted successfully.");
-      } catch (err) {
+      } catch {
         toast.error("Could not delete. Check for active students.");
       }
     }
   };
-
-  // --- Sub-View: Create/Edit ---
   if (view === 'create' || view === 'edit') {
     return (
       <div className="container mx-auto p-6 max-w-5xl animate-in fade-in slide-in-from-bottom-4">
@@ -139,6 +136,14 @@ const TeacherDashboard = () => {
       </div>
     );
   }
+
+  if (status === 'loading') {
+        return (
+            <div className="flex h-screen items-center justify-center p-20 text-center animate-pulse font-black text-indigo-600">
+                LOADING INSTRUCTOR DASHBOARD...
+            </div>
+        );
+    }
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-10 selection:bg-primary/10">
