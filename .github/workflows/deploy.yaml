@@ -12,17 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      
+          cache: 'npm' 
+
       - name: Install Dependencies
         run: npm install
         
       - name: Run Linter
-        run: npm run lint || echo "Linting failed, check your code style"
+        run: npm run lint
 
   test:
     name: Frontend Unit Tests
@@ -30,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -39,8 +41,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
         
-      - name: Run Vitest / Jest
-        run: npm test -- --watchAll=false
+      - name: Run Vitest
+        run: npx vitest run
 
   deploy:
     name: Vercel Production Deploy
@@ -49,4 +51,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Deploy
-        run: echo "Tests passed! Vercel is now deploying..."
+        run: echo "Tests passed in innovet_tech_school! Vercel is now deploying..."
