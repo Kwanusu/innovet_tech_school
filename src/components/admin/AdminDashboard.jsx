@@ -231,7 +231,8 @@ const UserRow = ({ user }) => (
   </tr>
 );
 
-const HealthIndicator = ({ icon: label, status, latency }) => (
+// eslint-disable-next-line no-unused-vars
+const HealthIndicator = ({ icon: Icon, label, status, latency }) => (
   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 flex items-center gap-6 shadow-sm">
     <div className="p-4 bg-slate-50 rounded-2xl text-slate-900"><Icon size={24} /></div>
     <div>

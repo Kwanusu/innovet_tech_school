@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { useDispatch } from "react-redux";
 import { markLessonComplete } from "../../school/schoolSlice";
-import LessonNavigationFooter from "./LessonNavigationFooter";
+import LessonNavigationFooter from "../../pages/LessonNavigationFooter";
 import { FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
