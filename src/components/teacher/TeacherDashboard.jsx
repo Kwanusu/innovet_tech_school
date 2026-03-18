@@ -11,12 +11,9 @@ import {
 import GradingModal from './GradingModal';
 import EnrollmentModal from '../teacher/EnrolmentModal'; 
 import CourseCreateForm from '../../components/courses/CourseCreationForm'; 
-import API from '../../api/axiosConfig'
 
 // --- Shadcn UI ---
-import { 
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,9 +26,9 @@ import {
 // --- Icons ---
 import { 
   BookOpen, Users, Plus, ArrowLeft, MoreVertical, 
-  Trash2, Edit3, UserPlus, Send, Archive, 
+  Trash2, UserPlus, Send, Archive, 
   LayoutDashboard, ClipboardCheck, GraduationCap, 
-  Search, Dot, Settings2
+  Search, Dot, Settings2, Loader2
 } from "lucide-react";
 import { toast } from 'sonner';
 
@@ -47,6 +44,7 @@ const TeacherDashboard = () => {
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'edit'
   const [editingCourse, setEditingCourse] = useState(null);
   const [enrollModal, setEnrollModal] = useState({ open: false, courseId: null, title: '' });
+  const [isUpdating, setIsUpdating] = useState(null); // Track specific course being updated
   
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,14 +75,19 @@ const TeacherDashboard = () => {
   // --- Handlers ---
   const handleTogglePublish = async (course) => {
     const newStatus = !course.is_published;
+    setIsUpdating(course.id);
+    const toastId = toast.loading(newStatus ? "Publishing course..." : "Moving to drafts...");
+    
     try {
       await dispatch(updateCourse({ 
         id: course.id, 
         data: { is_published: newStatus } 
       })).unwrap();
-      toast.success(newStatus ? "Course is now LIVE!" : "Course moved to Drafts.");
-    } catch {
-      toast.error("Failed to update status.");
+      toast.success(newStatus ? "Course is now LIVE!" : "Course moved to Drafts.", { id: toastId });
+    } catch (err) {
+      toast.error("Failed to update status. Check backend logs.", { id: toastId });
+    } finally {
+      setIsUpdating(null);
     }
   };
 
@@ -94,15 +97,17 @@ const TeacherDashboard = () => {
   };
 
   const handleDeleteCourse = async (id) => {
-    if (window.confirm("Are you sure? This will remove all student progress.")) {
+    if (window.confirm("Are you sure? This will remove all student progress and enrollment records.")) {
       try {
         await dispatch(deleteCourse(id)).unwrap();
         toast.success("Course deleted successfully.");
       } catch {
-        toast.error("Could not delete. Check for active students.");
+        toast.error("Could not delete. Check for active dependencies.");
       }
     }
   };
+
+  /* Editor View Render */
   if (view === 'create' || view === 'edit') {
     return (
       <div className="container mx-auto p-6 max-w-5xl animate-in fade-in slide-in-from-bottom-4">
@@ -137,14 +142,17 @@ const TeacherDashboard = () => {
     );
   }
 
+  /* Loading State */
   if (status === 'loading') {
-        return (
-            <div className="flex h-screen items-center justify-center p-20 text-center animate-pulse font-black text-indigo-600">
-                LOADING INSTRUCTOR DASHBOARD...
-            </div>
-        );
-    }
+      return (
+          <div className="flex h-screen items-center justify-center p-20 text-center animate-pulse font-black text-primary uppercase tracking-widest">
+              <Loader2 className="mr-3 h-8 w-8 animate-spin" />
+              Loading Innovet Instructor Hub...
+          </div>
+      );
+  }
 
+  /* Main Dashboard Render */
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-10 selection:bg-primary/10">
       
@@ -155,16 +163,16 @@ const TeacherDashboard = () => {
             Instructor Hub <GraduationCap className="text-primary h-9 w-9" />
           </h1>
           <div className="flex items-center gap-2 mt-2 text-slate-500 font-bold">
-            <span>Logged in as {user?.username}</span>
+            <span>Welcome, {user?.username}</span>
             <Dot className="h-4 w-4 text-slate-300" />
-            <span className="text-primary">{instructorCourses.length} Courses</span>
+            <span className="text-primary">{instructorCourses.length} Active Courses</span>
           </div>
         </div>
         <Button 
           onClick={() => setView('create')} 
           className="rounded-2xl h-14 px-8 font-black shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 text-md"
         >
-          <Plus className="mr-2 h-6 w-6" /> Create Course
+          <Plus className="mr-2 h-6 w-6" /> Create New Course
         </Button>
       </div>
 
@@ -188,7 +196,7 @@ const TeacherDashboard = () => {
             <div className="relative flex-1 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
               <Input 
-                placeholder="Find a course..." 
+                placeholder="Search by title or course code..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 h-14 bg-slate-50/50 border-none rounded-2xl focus-visible:ring-4 focus-visible:ring-primary/10 transition-all font-medium text-lg"
@@ -215,6 +223,7 @@ const TeacherDashboard = () => {
                 <CourseCard 
                   key={course.id} 
                   course={course} 
+                  isUpdating={isUpdating === course.id}
                   onDelete={() => handleDeleteCourse(course.id)} 
                   onEdit={handleEditClick}
                   onTogglePublish={() => handleTogglePublish(course)}
@@ -224,8 +233,8 @@ const TeacherDashboard = () => {
             ) : (
               <EmptyState 
                 icon={<BookOpen />} 
-                title={searchQuery ? "No matches found" : "Your classroom is empty"} 
-                description={searchQuery ? "Try a different search term or filter." : "Create your first course to start teaching."}
+                title={searchQuery ? "No matches found" : "No courses yet"} 
+                description={searchQuery ? "Try refining your search terms." : "Ready to share your knowledge? Start by creating your first curriculum."}
                 action={searchQuery ? () => setSearchQuery('') : () => setView('create')}
               />
             )}
@@ -265,8 +274,8 @@ const TeacherDashboard = () => {
 
 /* --- SUB-COMPONENTS --- */
 
-const CourseCard = ({ course, onDelete, onEnroll, onEdit, onTogglePublish }) => {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://innovet-tech-sch.onrender.com';
+const CourseCard = ({ course, isUpdating, onDelete, onEnroll, onEdit, onTogglePublish }) => {
+  const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
   const thumbnailUrl = course.thumbnail 
     ? (course.thumbnail.startsWith('http') ? course.thumbnail : `${BACKEND_URL}${course.thumbnail}`)
     : null;
@@ -291,7 +300,7 @@ const CourseCard = ({ course, onDelete, onEnroll, onEdit, onTogglePublish }) => 
       <CardHeader className="p-8 pb-4 flex-1">
         <div className="flex justify-between items-start">
           <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase opacity-60">
-            {course.code || "LMS-UNIT"}
+            {course.code || "UNIT-N/A"}
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -300,20 +309,20 @@ const CourseCard = ({ course, onDelete, onEnroll, onEdit, onTogglePublish }) => 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-2xl w-56 p-2 shadow-xl">
-              <DropdownMenuItem onClick={onEnroll} className="rounded-xl p-3 font-bold cursor-pointer">
+              <DropdownMenuItem onClick={onEnroll} className="rounded-xl p-3 font-bold cursor-pointer hover:bg-primary/5">
                 <UserPlus size={18} className="mr-3 text-primary" /> Enroll Student
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(course)} className="rounded-xl p-3 font-bold cursor-pointer">
                 <Settings2 size={18} className="mr-3 text-slate-500" /> Course Settings
               </DropdownMenuItem>
               <div className="h-px bg-slate-100 my-2" />
-              <DropdownMenuItem className="text-red-600 rounded-xl p-3 font-bold cursor-pointer" onClick={onDelete}>
+              <DropdownMenuItem className="text-red-600 rounded-xl p-3 font-bold cursor-pointer hover:bg-red-50" onClick={onDelete}>
                 <Trash2 size={18} className="mr-3" /> Delete Course
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <CardTitle className="text-2xl font-black text-slate-900 line-clamp-2 mt-3 tracking-tight">
+        <CardTitle className="text-2xl font-black text-slate-900 line-clamp-2 mt-3 tracking-tight group-hover:text-primary transition-colors">
           {course.title}
         </CardTitle>
       </CardHeader>
@@ -324,7 +333,7 @@ const CourseCard = ({ course, onDelete, onEnroll, onEdit, onTogglePublish }) => 
             <Users className="h-3 w-3" /> {course.student_count || 0} Students
           </div>
           <Dot className="h-4 w-4" />
-          <div className="text-slate-900">
+          <div className="text-slate-900 font-black">
             {parseFloat(course.price) === 0 ? "Free Access" : `$${course.price}`}
           </div>
         </div>
@@ -332,17 +341,18 @@ const CourseCard = ({ course, onDelete, onEnroll, onEdit, onTogglePublish }) => 
         <div className="flex gap-3">
           <Button 
             onClick={() => onEdit(course)}
-            className="flex-1 rounded-2xl font-black h-12 bg-slate-900 hover:bg-primary transition-all shadow-lg"
+            className="flex-1 rounded-2xl font-black h-12 bg-slate-900 hover:bg-primary transition-all shadow-lg active:scale-95"
           >
             Manage Content
           </Button>
           <Button 
             variant="outline" 
             size="icon"
+            disabled={isUpdating}
             onClick={onTogglePublish}
-            className={`rounded-2xl h-12 w-12 border-2 transition-colors ${course.is_published ? "text-slate-300 border-slate-100" : "text-emerald-600 border-emerald-100 bg-emerald-50 hover:bg-emerald-100"}`}
+            className={`rounded-2xl h-12 w-12 border-2 transition-all ${course.is_published ? "text-slate-300 border-slate-100" : "text-emerald-600 border-emerald-100 bg-emerald-50 hover:bg-emerald-100"}`}
           >
-            {course.is_published ? <Archive size={20} /> : <Send size={20} />}
+            {isUpdating ? <Loader2 className="h-5 w-5 animate-spin" /> : course.is_published ? <Archive size={20} /> : <Send size={20} />}
           </Button>
         </div>
       </CardContent>
@@ -387,22 +397,22 @@ const SubmissionTable = ({ data, onGrade }) => (
                     : "border-amber-100 bg-amber-50 text-amber-700"
                 }`}
               >
-                {sub.grade ? `Grade: ${sub.grade}%` : "Awaiting Review"}
+                {sub.grade ? `Score: ${sub.grade}%` : "Awaiting Review"}
               </Badge>
             </TableCell>
             <TableCell className="py-6 text-right pr-10">
               <Button 
                 onClick={() => onGrade(sub)} 
-                className="rounded-xl font-black bg-white border-2 border-slate-100 text-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                className={`rounded-xl font-black border-2 transition-all ${sub.grade ? "bg-white border-slate-100 text-slate-500" : "bg-white border-primary text-primary hover:bg-primary hover:text-white"}`}
               >
-                Open Review
+                {sub.grade ? "Edit Grade" : "Review Submission"}
               </Button>
             </TableCell>
           </TableRow>
         )) : (
           <TableRow>
             <TableCell colSpan={4} className="text-center py-32 opacity-30 italic font-medium">
-              No submissions found.
+              The grading queue is currently empty.
             </TableCell>
           </TableRow>
         )}
@@ -422,7 +432,7 @@ const EmptyState = ({ icon, title, description, action }) => (
       onClick={action} 
       className="rounded-2xl h-16 px-10 text-lg font-black shadow-2xl shadow-primary/30 transition-all active:scale-95"
     >
-      <Plus className="mr-2 h-6 w-6" /> Create Course
+      <Plus className="mr-2 h-6 w-6" /> Get Started
     </Button>
   </div>
 );

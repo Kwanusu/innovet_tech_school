@@ -20,7 +20,7 @@ const ResetPasswordConfirm = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        await API.get(`api/auth/validate-token/${uid}/${token}/`);
+        await API.get(`api/auth/validate-token/${uid}/${token}`);
         setStatus('idle');
       } catch (err) {
        setError(err.response?.data?.detail || 'An error occurred. Please try again.');

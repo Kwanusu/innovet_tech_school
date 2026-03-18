@@ -38,6 +38,18 @@ export const register = createAsyncThunk('auth/register', async (userData, { rej
     }
 });
 
+export const updateProfile = createAsyncThunk(
+    'auth/updateProfile',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await API.patch('/api/auth/profile/update/', formData);
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data || 'Failed to update profile');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -103,9 +115,21 @@ const authSlice = createSlice({
                 state.user = null;
                 state.token = null;
                 state.error = action.payload;
-            });
+            })
+            .addCase(updateProfile.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.user = action.payload;
+            })
+            .addCase(updateProfile.rejected, (state, error) => {
+                state.status = 'failed';
+                state.error = error.payload;
+            })
+        }
     }
-});
+);
 
 export const { logout, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

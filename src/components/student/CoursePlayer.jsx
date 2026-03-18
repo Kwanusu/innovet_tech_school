@@ -48,7 +48,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen w-full overflow-hidden bg-white">
 
       <CurriculumSidebar
         course={currentCourse}

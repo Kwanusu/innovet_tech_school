@@ -8,14 +8,22 @@ const handleAsyncError = (error, rejectWithValue) => {
 export const fetchCourses = createAsyncThunk('school/fetchCourses', async (_, { getState, rejectWithValue }) => {
     try {
         const { user } = getState().auth;
-        const endpoint = user?.role === 'TEACHER' ? '/api/courses/my-courses/' : '/api/courses/enrolled-courses/';
+        
+        let endpoint;
+        if (user?.role === 'ADMIN') {
+            endpoint = '/api/courses/'; 
+        } else if (user?.role === 'TEACHER') {
+            endpoint = '/api/courses/my-courses/';
+        } else {
+            endpoint = '/api/courses/enrolled-courses/';
+        }
+
         const response = await API.get(endpoint);
         return response.data;
     } catch (error) {
         return handleAsyncError(error, rejectWithValue);
     }
 });
-
 export const fetchCourseById = createAsyncThunk(
   "school/fetchCourseById",
   async (courseId, { rejectWithValue }) => {
@@ -84,7 +92,7 @@ export const enrollStudent = createAsyncThunk(
   async ({ courseId, email }, { rejectWithValue }) => {
     try {
     
-      const response = await API.post(`/api/courses/${courseId}/enroll/`, { email });
+      const response = await API.post(`/api/enrollments/`,{courseId, email} );
       
       
       return { courseId, student: response.data }; 

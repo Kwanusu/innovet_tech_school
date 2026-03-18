@@ -2,9 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-
 import { loadUser } from './components/auth/authSlice';
-
 import Login from './pages/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Navbar from './components/layouts/Navbar';
@@ -17,6 +15,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordConfirm from './pages/PasswordResetConfirm';
 import CoursePlayer from './components/student/CoursePlayer';
+import CourseCompletionPage from './pages/CourseCompletionPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -55,6 +54,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirm />} />
             <Route path="/courses" element={<BrowseCoursesPage />} />
+            <Route path="/courses/:courseId/congratulations" element={<CourseCompletionPage />} />
 
             <Route 
               path="/dashboard" 

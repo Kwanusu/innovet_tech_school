@@ -6,11 +6,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, status, token } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  const isInitializing = status === 'loading' || status === 'idle';
+  // 1. IMPROVED INITIALIZING CHECK
+  // If we have a token but no user object, we MUST be in a loading state 
+  // regardless of what the "status" string says (prevents race conditions).
+  const isInitializing = status === 'loading' || (token && !user);
 
-  const isFetchingUser = token && !user;
-
-  if (isInitializing || isFetchingUser) {
+  if (isInitializing) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
         <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
@@ -21,17 +22,30 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     );
   }
 
+  // 2. TOKEN CHECK
+  // If there's no token at all, they definitely aren't logged in.
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // 3. USER OBJECT CHECK
+  // If initialization finished but we still don't have a user, the token was likely invalid.
   if (!user) {
-    console.warn("[Auth] No user found, redirecting to login");
+    console.warn("[Auth] Session invalid or profile fetch failed");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   const userRole = user?.role?.toUpperCase();
   const normalizedRoles = allowedRoles?.map(role => role.toUpperCase());
 
+  // 4. ROLE CHECK
   if (normalizedRoles && !normalizedRoles.includes(userRole)) {
     console.error(`[Access Denied] User Role: ${userRole} | Required: ${normalizedRoles}`);
-    return <Navigate to="/dashboard" replace />; 
+    
+    // Redirect admins to /admin if they accidentally hit a student route, 
+    // and others to the standard dashboard.
+    const redirectPath = userRole === 'ADMIN' ? '/admin' : '/dashboard';
+    return <Navigate to={redirectPath} replace />; 
   }
   
   return (

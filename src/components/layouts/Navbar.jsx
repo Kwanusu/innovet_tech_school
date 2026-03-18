@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../auth/authSlice';
+import ProfileEditor from '../../pages/ProfileEditor'; 
 
 import { 
   DropdownMenu, 
@@ -18,6 +19,7 @@ import {
   SheetTitle, 
   SheetTrigger 
 } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +44,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   
   const { user, token } = useSelector((state) => state.auth);
   const { submissions = [] } = useSelector((state) => state.school || {});
@@ -72,11 +75,13 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <NavLink to="/courses" active={isActive('/courses')}>Browse Courses</NavLink>
+          {/* RESTORED: Specific logic to prevent blank page/forbidden access */}
+          {user?.role === 'STUDENT' && !token && (
+            <NavLink to="/courses" active={isActive('/courses')}>Browse Courses</NavLink>
+          )}
 
           {token && (
             <>
-
               {user?.role === 'ADMIN' && (
                 <NavLink to="/admin" active={isActive('/admin')}>
                    <span className="flex items-center gap-1.5 text-indigo-600">
@@ -158,7 +163,7 @@ const Navbar = () => {
                       </DropdownMenuItem>
                     )}
 
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="rounded-xl p-3 font-bold cursor-pointer hover:bg-slate-50">
+                    <DropdownMenuItem onClick={() => setIsProfileOpen(true)} className="rounded-xl p-3 font-bold cursor-pointer hover:bg-slate-50">
                         <User className="mr-3 h-4 w-4 text-primary" /> Profile Settings
                     </DropdownMenuItem>
 
@@ -196,6 +201,15 @@ const Navbar = () => {
                       )}
                       <MobileNavLink to="/courses" icon={BookOpen} isActive={isActive('/courses')} setIsOpen={setIsOpen}>Browse Courses</MobileNavLink>
                       <MobileNavLink to="/dashboard" icon={LayoutDashboard} isActive={isActive('/dashboard')} setIsOpen={setIsOpen}>Dashboard</MobileNavLink>
+                      
+                      {/* Integrated Modal Toggle */}
+                      <button 
+                        onClick={() => { setIsOpen(false); setIsProfileOpen(true); }}
+                        className="flex w-full items-center gap-4 p-4 rounded-2xl font-black text-slate-600 hover:bg-slate-50 transition-all text-left"
+                      >
+                        <User size={20} className="text-slate-400" />
+                        <span className="text-[13px] uppercase tracking-wider">Profile Settings</span>
+                      </button>
                     </div>
 
                     <div className="p-6 bg-slate-50">
@@ -219,6 +233,13 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Profile Modal */}
+      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <DialogContent className="max-w-2xl p-0 bg-transparent border-none shadow-none outline-none">
+          {isProfileOpen && <ProfileEditor key="navbar-profile-editor" onClose={() => setIsProfileOpen(false)} />}
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 };

@@ -34,7 +34,7 @@ const LessonNavigationFooter = ({
     if (!course || !currentLessonId) return null;
 
     return (
-        <footer className="fixed bottom-0 right-0 left-0 lg:left-85 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-40 transition-all duration-300">
+        <footer className="fixed bottom-0 right-0 left-0 lg:left-[320px] bg-white/80 backdrop-blur-xl border-t border-slate-100 z-40 transition-all duration-300">
             <div className="max-w-5xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between gap-4">
 
                 <div className="flex-1">

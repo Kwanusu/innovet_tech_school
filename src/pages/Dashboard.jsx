@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import StudentDashboard from '../components/student/StudentDashboard';
 import TeacherDashboard from '../components/teacher/TeacherDashboard'
