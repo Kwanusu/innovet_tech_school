@@ -84,7 +84,7 @@ const TeacherDashboard = () => {
         data: { is_published: newStatus } 
       })).unwrap();
       toast.success(newStatus ? "Course is now LIVE!" : "Course moved to Drafts.", { id: toastId });
-    } catch (err) {
+    } catch {
       toast.error("Failed to update status. Check backend logs.", { id: toastId });
     } finally {
       setIsUpdating(null);
