@@ -4,7 +4,8 @@ import auditReducer from '../features/audit/auditSlice';
 import schoolReducer from '../school/schoolSlice';
 import { adminApi } from '../api/adminApi'; 
 
-const store = configureStore({
+export const setupStore = (preloadedState) => {
+return configureStore({
     reducer: {
         auth: authReducer,
         school: schoolReducer,
@@ -13,6 +14,7 @@ const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(adminApi.middleware),
+    preloadedState
 });
-
-export default store;
+}
+export const store = setupStore();

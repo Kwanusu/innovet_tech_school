@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import confetti from 'canvas-confetti'; // Optional: npm install canvas-confetti
 
 const CourseCompletionPage = () => {
-  const { courseId } = useParams();
+  const { courseId: _courseId } = useParams();
   const navigate = useNavigate();
   const { currentCourse } = useSelector((state) => state.school);
 

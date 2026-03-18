@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useDispatch } from "react-redux";
 import { markLessonComplete } from "../../school/schoolSlice";
@@ -7,6 +7,7 @@ import { FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const LessonPlayer = ({
+  course,
   lessons = [],
   lesson,
   completedLessons = [],
@@ -15,36 +16,35 @@ const LessonPlayer = ({
   loading = false
 }) => {
   const dispatch = useDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Memoize index to avoid recalculating on every render
+  // We only need the index to find the next lesson for auto-advance
   const index = useMemo(
     () => lessons.findIndex(l => l.id === lesson?.id),
     [lessons, lesson?.id]
   );
 
-  const nextLesson = index < lessons.length - 1 ? lessons[index + 1] : null;
-  const prevLesson = index > 0 ? lessons[index - 1] : null;
   const isCompleted = completedLessons.includes(lesson?.id);
 
   const handleComplete = async () => {
     if (!lesson) return;
-
+    setIsSubmitting(true);
+    
     try {
-      // 1. Only dispatch if not already completed
       if (!isCompleted) {
-        await dispatch(
-          markLessonComplete({ courseId, lessonId: lesson.id })
-        ).unwrap();
-        toast.success("Progress updated");
+        await dispatch(markLessonComplete({ courseId, lessonId: lesson.id })).unwrap();
+        toast.success("Lesson marked as complete!");
       }
-
-      // 2. Auto-advance logic
+      
+      // Auto-advance logic: find the next lesson from our flattened list
+      const nextLesson = index < lessons.length - 1 ? lessons[index + 1] : null;
       if (nextLesson) {
         setActiveLessonId(nextLesson.id);
       }
-    } catch {
-      // 'catch' without 'err' satisfies the no-unused-vars rule
-      toast.error("Failed to save progress. Please check your connection.");
+    } catch  {
+      toast.error("Failed to update progress. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -113,12 +113,11 @@ const LessonPlayer = ({
 
       {/* Navigation Footer */}
       <LessonNavigationFooter
-        currentLesson={lesson}
-        nextLesson={nextLesson}
-        prevLesson={prevLesson}
+        course={course}
+        currentLessonId={lesson?.id}
         isCompleted={isCompleted}
-        onComplete={handleComplete}
-        onNavigate={(id) => setActiveLessonId(id)}
+        onMarkAsComplete={handleComplete}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
